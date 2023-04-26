@@ -24,4 +24,5 @@ class FPTItem(scrapy.Item):
     price_present = scrapy.Field()
     price_old = scrapy.Field()
     image = scrapy.Field()
+    link = scrapy.Field()
     pass

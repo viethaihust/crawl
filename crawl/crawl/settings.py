@@ -17,7 +17,7 @@ NEWSPIDER_MODULE = "crawl.spiders"
 #USER_AGENT = "crawl (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -107,7 +107,10 @@ SPIDER_MIDDLEWARES = {
 DOWNLOADER_MIDDLEWARES = {
     'scrapy_splash.SplashCookiesMiddleware': 723,
     'scrapy_splash.SplashMiddleware': 725,
-'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
-'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': 400,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None,
+    'random_useragent.RandomUserAgentMiddleware': 400,
 }
 DOWNLOAD_DELAY = 10
+
+USER_AGENT_LIST = "C:/Users/win10/Desktop/Code/venv/crawl/user-agents.txt"

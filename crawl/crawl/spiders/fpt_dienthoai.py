@@ -6,14 +6,14 @@ class FptDienthoaiSpider(scrapy.Spider):
     name = "fpt_dienthoai"
     allowed_domains = ["fptshop.com.vn"]
     CATEGORIES = ['dien-thoai', 'may-tinh-xach-tay', 'may-tinh-bang', 'may-tinh-de-ban']
-    start_urls = ["http://fptshop.com.vn/may-tinh-bang"]
+    start_urls = ["http://fptshop.com.vn/dien-thoai"]
 
     render_script = '''
     function main(splash)
         assert(splash:go(splash.args.url))
-        assert(splash:wait(2))
+        assert(splash:wait(5))
 
-        local num_scrolls = 10
+        local num_scrolls = 15
         local scroll_delay = 1
 
         local scroll_to = splash:jsfunc("window.scrollTo")
@@ -23,15 +23,15 @@ class FptDienthoaiSpider(scrapy.Spider):
 
         for _ = 1, num_scrolls do
             local height = get_body_height()
-            for i = 1, 10 do
-                scroll_to(0, height * i/10)
-                splash:wait(scroll_delay/10)
+            for i = 1, 15 do
+                scroll_to(0, height * i/15)
+                splash:wait(scroll_delay/15)
             end
         end
 
-        assert(splash:wait(2))
+        assert(splash:wait(5))
         assert(splash:runjs("document.querySelector('div.cdt-product--loadmore > a').click()"))
-        assert(splash:wait(2))
+        assert(splash:wait(5))
         
         return {
             html = splash:html(),
@@ -44,9 +44,15 @@ class FptDienthoaiSpider(scrapy.Spider):
         for url in self.start_urls:
             yield SplashRequest(
                 url,
-                endpoint="render.html",
-                args={
-                    'wait': 5,
+                meta={
+                    "splash": {
+                        "endpoint": "execute",
+                        "args": {
+                            'wait': 5,
+                            'url': url,
+                            "lua_source": self.render_script,
+                        },
+                    }
                 },
                 callback=self.parse,
                 dont_filter=True
@@ -58,7 +64,8 @@ class FptDienthoaiSpider(scrapy.Spider):
             item["product_name"] = product.css("h3 ::text").extract_first()
             item["price_present"] = product.css("div.cdt-product__show-promo > div.progress ::text, div.price ::text").extract_first()
             item["price_old"] = product.css("div.strike-price ::text").extract_first()
-            item['image'] = product.css("div.cdt-product__img img::attr(src)").extract_first()
+            item['image'] = product.css("img::attr(src), img::attr(src)").extract_first()
+            item['link'] = "https://fptshop.com.vn" + product.css("a::attr(href)").extract_first()
             yield item
 
         yield SplashRequest(
